@@ -1,0 +1,4 @@
+#! /usr/bin/bash
+
+source databaseScript
+source tableScript
