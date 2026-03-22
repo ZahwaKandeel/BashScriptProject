@@ -1,0 +1,26 @@
+#! /usr/bin/bash
+source tableScript
+connect_db(){
+	read -p "Enter database name: " database
+	
+	if [ -d databases/${database} ]
+	then 
+		cd databases/${database}
+		table_menu
+	else
+		echo "Database name you entered does not exist"
+	fi
+}
+
+drop_db(){
+	read -p "Enter database name: " database
+	
+	if [ -d databases/${database} ]
+	then 
+		rm -r databases/${database}
+		echo "Database Deleted"
+	else
+		echo "Database name you entered does not exist"
+	fi
+}
+
