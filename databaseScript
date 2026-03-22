@@ -1,5 +1,14 @@
 #! /usr/bin/bash
 source tableScript
+
+function createDB(){
+	mkdir "$HOME/BashScriptProject/$1";
+}
+
+function listDBs(){
+	ls -d "$HOME/BashScriptProject"/*/;
+}
+
 connect_db(){
 	read -p "Enter database name: " database
 	
