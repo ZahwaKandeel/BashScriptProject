@@ -2,11 +2,11 @@
 source tableScript
 
 function createDB(){
-	mkdir "$HOME/BashScriptProject/$1";
+	mkdir "databases/$1";
 }
 
 function listDBs(){
-	ls -d "$HOME/BashScriptProject"/*/;
+	ls -d "databases"/*/;
 }
 
 connect_db(){

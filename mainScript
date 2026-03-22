@@ -20,12 +20,10 @@ do
 			echo Thats all the databases
 			;;
 		"Connect To Databases")
-			#function call
-			echo Database Connected
+			connect_db
 			;;
 		"Drop Database")
-			#function call
-			echo Database dropped
+			drop_db
 			;;
 esac
 
