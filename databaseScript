@@ -16,6 +16,7 @@ connect_db(){
 	then 
 		cd databases/${database}
 		table_menu
+		cd ../..
 	else
 		echo "Database name you entered does not exist"
 	fi
