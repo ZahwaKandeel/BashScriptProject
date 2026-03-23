@@ -11,13 +11,10 @@ select option in "${options[@]}"
 do
 	case $option in 
 		"Create Database")
-			read -p "Enter the name of the database you want to create:" dbName
-			createDB "$dbName"
-			echo Database $dbName Created
+			createDB
 			;;
 		"List Databases")
 			listDBs
-			echo Thats all the databases
 			;;
 		"Connect To Databases")
 			connect_db

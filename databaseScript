@@ -2,11 +2,21 @@
 source tableScript
 
 function createDB(){
-	mkdir "databases/$1";
+	read -p "Enter the name of the database you want to create:" dbName
+	
+	if [ -d databases/${dbName} ]
+	then
+		echo That database name exists
+	else
+		mkdir "databases/${dbName}";
+		echo Database ${dbName} Created
+	fi
 }
 
 function listDBs(){
 	ls -d "databases"/*/;
+	
+	echo Thats all the databases
 }
 
 connect_db(){
