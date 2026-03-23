@@ -62,6 +62,7 @@ The system simulates core database functionalities such as managing databases, t
 
 **Database Menu:**
 
+* Create Table
 * Drop Table
 * Delete From Table
 
@@ -77,6 +78,7 @@ The system simulates core database functionalities such as managing databases, t
 **Database Menu:**
 
 * List Tables
+* Insert into Table
 * Select From Table
 
 ---
@@ -85,8 +87,6 @@ The system simulates core database functionalities such as managing databases, t
 
 These tasks require collaboration due to their complexity:
 
-* Create Table
-* Insert into Table
 * Update Table
 
 ---
