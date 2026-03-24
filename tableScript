@@ -37,3 +37,67 @@ do
 	esac
 done
 }
+
+create_table(){
+	read -p "Enter table name: " tname
+
+	if [[ -z "$tname" || ! "$tname" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]; then
+	    echo "Error: Invalid table name."
+	    return
+	fi
+	
+
+	if [ -f "$tname" ]; then
+	    echo "Error: Table '$tname' already exists."
+	    return
+	fi
+	
+	read -p "How many columns? " cols_num
+
+	header=""
+	pk_set=0
+
+	for (( i=1; i<=cols_num; i++ )); 
+	do
+    	read -p "Column $i name: " cname
+    	if [[ -z "$cname" || ! "$cname" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]; 
+    	then
+        	echo "Invalid column name."; 
+        	return
+    	fi
+
+    	while true; 
+    	do
+        	read -p "Datatype for '$cname' (int/string/float): " dtype
+        	if [[ "$dtype" == "int" || "$dtype" == "string" || "$dtype" == "float" ]]; 
+        	then
+            		break
+        	fi
+        	echo "Invalid datatype. Choose: int, string, float"
+    	done
+
+
+    	pk_flag=""
+    	if [ $pk_set -eq 0 ]; 
+    	then
+        	read -p "Is '$cname' the primary key? (y/n): " is_pk
+        	if [[ "$is_pk" == "y" || "$is_pk" == "Y" ]]; then
+            	pk_flag=":PK"
+            	pk_set=1
+        	fi
+    	fi
+
+        if [ -z "$header" ]; then
+        	header="$cname:$dtype$pk_flag"
+    	else
+        	header="$header | $cname:$dtype$pk_flag"
+    	fi
+    	
+	done
+	
+	
+	touch $tname
+	echo "$header" > "$tname"
+	echo "Table '$tname' created successfully"
+
+}
