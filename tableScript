@@ -81,19 +81,28 @@ create_table(){
     	if [ $pk_set -eq 0 ]; 
     	then
         	read -p "Is '$cname' the primary key? (y/n): " is_pk
-        	if [[ "$is_pk" == "y" || "$is_pk" == "Y" ]]; then
+        	if [[ "$is_pk" == "y" || "$is_pk" == "Y" ]]; 
+        	then
             	pk_flag=":PK"
             	pk_set=1
         	fi
     	fi
 
-        if [ -z "$header" ]; then
+        if [ -z "$header" ]; 
+        then
         	header="$cname:$dtype$pk_flag"
     	else
         	header="$header | $cname:$dtype$pk_flag"
     	fi
     	
 	done
+	
+	if [ $pk_set -eq 0 ]; 
+	then
+    	echo "Error: You must choose a primary key column."
+    	echo "Table '$tname' was not created."
+    	return
+	fi
 	
 	
 	touch $tname
