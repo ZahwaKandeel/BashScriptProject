@@ -102,3 +102,12 @@ create_table(){
 
 }
 
+list_tables(){
+	if [ "$(ls -A)" ]
+	then
+		ls -f 
+		echo Thats all the tables
+	else
+		echo There is no saved tables
+	fi
+}
