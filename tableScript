@@ -111,3 +111,73 @@ list_tables(){
 		echo There is no saved tables
 	fi
 }
+
+insert_into_table(){
+	read -p "Enter table name: " tname
+	
+        if [ -f "$tname" ];
+        then
+        	echo "That the '$tname' table :"
+		cat "$tname"
+		
+		IFS='|' read -r -a columns < "$tname"
+		new_row=""
+		col_index=1
+		
+		for col_data in "${columns[@]}";
+			do
+			col_data=$(echo "$col_data" )
+			col_name=$(echo "$col_data" | cut -d: -f1)
+			col_type=$(echo "$col_data" | cut -d: -f2)
+			col_pk=$(echo "$col_data" | cut -d: -f3 | xargs)
+			
+			valid=false
+			while [ "$valid" = false ];
+			do
+				read -p "Enter $col_name ($col_type): " value
+				
+				if [ "$col_type" = "int" ];
+				then
+					if [[ ! $value =~ ^[0-9]+$ ]];
+					then 
+						echo "Invalid input! Please enter integer."
+						continue
+					fi
+				elif [ "$col_type" = "float" ];
+				then
+					if [[ ! $value =~ ^[+-]?[0-9]*\.?[0-9]+$ ]];
+					then
+						echo "Invalid input! Please enter float."
+						continue
+					fi
+				else
+					valid=true
+				fi
+				
+				if [ "$col_pk" = "PK" ]
+				then
+					if cut -d'|' -f"$col_index" "$tname" | tail -n +2 | grep -qx "$value"; 
+					then
+    						echo "This $col_name already exists, insert other $col_name"
+						continue
+					fi
+				fi
+				
+				valid=true
+			done
+			
+			if [ -z "$new_row" ];
+			then
+				new_row="$value"
+			else
+				new_row="$new_row|$value"
+			fi
+			((col_index ++))
+		done
+			
+		echo "$new_row" >> "$tname"
+		echo "Data inserted successfully"
+        else
+        	echo "There is no table with that name"
+        fi
+}
