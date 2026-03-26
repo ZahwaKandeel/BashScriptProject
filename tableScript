@@ -121,6 +121,18 @@ list_tables(){
 	fi
 }
 
+drop_table(){
+	read -p "Enter table name: " tname
+	
+	if [ -f "$tname" ]
+	then 
+		rm $tname
+		echo "Table Deleted"
+	else
+		echo "Error: Table name you entered does not exist"
+	fi
+}
+
 insert_into_table(){
 	read -p "Enter table name: " tname
 	
