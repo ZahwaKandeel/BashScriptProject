@@ -41,13 +41,15 @@ done
 create_table(){
 	read -p "Enter table name: " tname
 
-	if [[ -z "$tname" || ! "$tname" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]; then
+	if [[ -z "$tname" || ! "$tname" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]; 
+	then
 	    echo "Error: Invalid table name."
 	    return
 	fi
 	
 
-	if [ -f "$tname" ]; then
+	if [ -f "$tname" ]; 
+	then
 	    echo "Error: Table '$tname' already exists."
 	    return
 	fi
@@ -92,7 +94,7 @@ create_table(){
         then
         	header="$cname:$dtype$pk_flag"
     	else
-        	header="$header | $cname:$dtype$pk_flag"
+        	header="$header|$cname:$dtype$pk_flag"
     	fi
     	
 	done
@@ -201,4 +203,52 @@ insert_into_table(){
         else
         	echo "There is no table with that name"
         fi
+}
+
+
+delete_from_table(){
+
+	read -p "Enter table name: " tname
+
+	if [ ! -f "$tname" ]; 
+	then
+    	echo "Table does not exist"
+    	return
+	fi
+
+	header=$(head -1 "$tname")
+	echo "Columns:"
+	echo "$header" | tr '|' '\n' | cut -d':' -f1
+
+	read -p "Enter column name: " col
+
+	col_index=$(echo "$header" | tr '|' '\n' | grep -n "^$col:" | cut -d':' -f1)
+
+	if [ -z "$col_index" ]; 
+	then
+    	echo "Column not found"
+    	return
+	fi
+
+	read -p "Enter value to delete: " val
+
+	found=$(awk -F'|' -v idx="$col_index" -v val="$val" '
+	NR>1 && $idx==val {print; exit}
+	' "$tname")
+
+	if [ -z "$found" ]; 
+	then
+    	echo "Value not found. Nothing deleted."
+    	return
+	fi
+
+	tmp=$(mktemp)
+
+	awk -F'|' -v idx="$col_index" -v val="$val" '
+	NR == 1 {print; next}
+	$idx != val {print}
+	' "$tname" > "$tmp"
+
+	mv "$tmp" "$tname"
+	echo "Delete completed"
 }
