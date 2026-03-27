@@ -235,6 +235,65 @@ select_from_tables(){
 	fi
 }
 
+select_all(){
+	if [ -f "$tname" ];
+	then
+		echo "================================================="
+		echo "             Table '$tname'            "
+		echo "================================================="
+		column -t -s '|' "$tname"
+		echo "================================================="
+	else
+		echo "Table not found"
+	fi
+}
+
+select_with_condition(){
+	read -p "Enter column name: " col_name
+	read -p "Enter value: " value
+	
+	if [ -f "$tname" ];
+	then
+		header=$(head -1 "$tname")
+		IFS='|' read -r -a columns <<< "$header"
+		col_index=-1
+		
+		for i in "${!columns[@]}";
+			do
+			col=$(echo "${columns[$i]}" | cut -d':' -f1 | xargs)
+			if [ "$col" == "$col_name" ];
+			then
+				col_index=$((i+1))
+				break
+			fi
+		done
+
+		if [ $col_index -eq -1 ];
+		then
+			echo "Column not found"
+			return
+		fi
+		awk -F'|' -v col="$col_index" -v val="$value" '
+			BEGIN {found=0}
+
+			NR==1 {header=$0; next}
+
+			$col == val {
+			    if (found == 0) print header
+			    print
+			    found=1
+			}
+
+			END {
+			    if (found == 0)
+				print "No matching records found"
+			}
+			' "$tname" | column -t -s '|'
+	else
+		echo "Table not found"
+	fi	
+}
+
 delete_from_table(){
 
 	read -p "Enter table name: " tname

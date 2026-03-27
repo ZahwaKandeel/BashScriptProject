@@ -1,5 +1,0 @@
-id:int:PK | name:string | gpa:float
-1|zahwa|3.5
-2|nada|3.4
-3|ahmed|3.3
-4|mamoud|3.2
