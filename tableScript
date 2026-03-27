@@ -205,6 +205,35 @@ insert_into_table(){
         fi
 }
 
+select_from_tables(){
+	read -p "Enter table you want to select from:" tname
+	
+	if [ -f "$tname" ];
+	then
+		while true
+		do
+		
+		echo "1) Select all from '$tname' "
+		echo "2) Select with condition from '$tname' "
+		echo "3) Back"
+		
+		read -p "Enter your choice: " choice
+		
+		case "$choice" in
+			1)
+				select_all;;
+			2)
+				select_with_condition;;
+			3)
+				break;;
+			*)
+			echo "Invalid choice" ;;
+		esac
+		done
+	else 
+		echo "Table '$tname' not found"
+	fi
+}
 
 delete_from_table(){
 
