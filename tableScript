@@ -340,3 +340,45 @@ delete_from_table(){
 	mv "$tmp" "$tname"
 	echo "Delete completed"
 }
+
+update_table(){
+
+	read -p "Enter table name: " tname
+	if [ ! -f "$tname" ]; 
+	then
+    	echo "Table does not exist"
+    	return
+	fi
+
+	header=$(head -1 "$tname")
+	echo "Columns:"
+	echo "$header" | tr '|' '\n' | cut -d':' -f1
+
+	read -p "Enter column to search: " col
+	col_index=$(echo "$header" | tr '|' '\n' | grep -n "^$col:" | cut -d':' -f1)
+
+	if [ -z "$col_index" ]; 
+	then
+    	echo "Column not found"
+    	return
+	fi
+
+	read -p "Enter value to search: " val
+	
+	read -p "Enter column to update: " col2
+	col2_index=$(echo "$header" | tr '|' '\n' | grep -n "^$col2:" | cut -d':' -f1)
+
+	if [ -z "$col2_index" ]; 
+	then
+    	echo "Column not found"
+    	return
+	fi
+	
+	read -p "Enter new value: " newval
+	
+	dtype=$(echo "$header" | tr '|' '\n' | grep "^$col2:" | cut -d':' -f2)
+	pk_col=$(echo "$header" | tr '|' '\n' | grep "PK" | cut -d':' -f1)
+
+	
+}	
+
