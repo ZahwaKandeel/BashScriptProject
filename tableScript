@@ -378,7 +378,57 @@ update_table(){
 	
 	dtype=$(echo "$header" | tr '|' '\n' | grep "^$col2:" | cut -d':' -f2)
 	pk_col=$(echo "$header" | tr '|' '\n' | grep "PK" | cut -d':' -f1)
-
 	
+	valid=false
+	while [ "$valid" = false ];
+	do
+		if [ "$dtype" = "int" ];
+		then
+			if [[ ! $newval =~ ^[0-9]+$ ]];
+			then 
+				echo "Invalid input! Please enter integer."
+				continue
+			fi
+		elif [ "$dtype" = "float" ];
+		then
+			if [[ ! $newval =~ ^[+-]?[0-9]*\.?[0-9]+$ ]];
+			then
+				echo "Invalid input! Please enter float."
+				continue
+			fi
+		fi
+		if [ "$col2" = "$pk_col" ];
+		then
+			echo "You cannot update Primary Key column"
+			return
+		fi
+		if [ "$col2" = "$pk_col" ];
+		then
+			if awk -F'|' -v col="$col_index" -v val="$val" \
+			       -v col2="$col2_index" -v newval="$newval" '
+			       NR>1 && $col != val && $col2 == newval {exit 1}
+			       END {exit 0}' "$tname"
+			then
+				echo "Valid data"
+			else
+				echo "This value already exists for PK"
+				continue
+			fi
+		fi
+		valid=true
+	done
+	tmp_file=$(mktemp)
+	awk -F'|' -v col="$col_index" -v val="$val" \
+	    -v col2="$col2_index" -v newval="$newval" \
+	    'BEGIN {OFS="|"}
+	    NR==1 {print; next}
+	    {
+		if ($col == val) {
+		    $col2 = newval
+		}
+		print
+	    }' "$tname" > "$tmp_file"
+	mv "$tmp_file" "$tname"
+	echo "Row updated successfully"
 }	
 
