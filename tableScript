@@ -185,7 +185,7 @@ insert_into_table(){
 						continue
 					fi
 				fi
-				
+			
 				valid=true
 			done
 			
@@ -374,14 +374,13 @@ update_table(){
     	return
 	fi
 	
-	read -p "Enter new value: " newval
-	
 	dtype=$(echo "$header" | tr '|' '\n' | grep "^$col2:" | cut -d':' -f2)
 	pk_col=$(echo "$header" | tr '|' '\n' | grep "PK" | cut -d':' -f1)
 	
 	valid=false
 	while [ "$valid" = false ];
 	do
+		read -p "Enter new value: " newval
 		if [ "$dtype" = "int" ];
 		then
 			if [[ ! $newval =~ ^[0-9]+$ ]];
@@ -397,38 +396,40 @@ update_table(){
 				continue
 			fi
 		fi
-		if [ "$col2" = "$pk_col" ];
+		if [ "$col2" = "$pk_col" ]; 
 		then
-			echo "You cannot update Primary Key column"
-			return
-		fi
-		if [ "$col2" = "$pk_col" ];
-		then
-			if awk -F'|' -v col="$col_index" -v val="$val" \
-			       -v col2="$col2_index" -v newval="$newval" '
-			       NR>1 && $col != val && $col2 == newval {exit 1}
-			       END {exit 0}' "$tname"
-			then
-				echo "Valid data"
-			else
-				echo "This value already exists for PK"
-				continue
-			fi
+		    conflict=$(awk -F'|' -v scol="$col_index" -v sval="$val" \
+		        -v ucol="$col2_index" -v newval="$newval" \
+		        'NR>1 && $scol != sval && $ucol == newval {found=1; exit}
+		         END {print found+0}' "$tname")
+		    if [ "$conflict" -eq 1 ]; 
+		    then
+		        echo "This value already exists for PK. Try again."
+		        continue
+		    fi
 		fi
 		valid=true
 	done
-	tmp_file=$(mktemp)
+	read -p "Update $match_count row(s)? (y/n): " confirm
+	if [[ ! $confirm =~ ^[Yy]$ ]]; then
+		echo "Update cancelled."
+		return
+	fi
+	
+	tmp_file=$(mktemp) || { echo "Failed to create temp file"; return; }
 	awk -F'|' -v col="$col_index" -v val="$val" \
-	    -v col2="$col2_index" -v newval="$newval" \
-	    'BEGIN {OFS="|"}
-	    NR==1 {print; next}
-	    {
-		if ($col == val) {
-		    $col2 = newval
-		}
-		print
-	    }' "$tname" > "$tmp_file"
-	mv "$tmp_file" "$tname"
-	echo "Row updated successfully"
+		-v col2="$col2_index" -v newval="$newval" \
+		'BEGIN {OFS="|"}
+		NR==1 {print; next}
+		{
+		    if ($col == val) $col2 = newval
+		    print
+		}' "$tname" > "$tmp_file"
+
+	if mv "$tmp_file" "$tname"; then
+		echo "Row(s) updated successfully"
+	else
+		echo "Update failed. Temp file left at: $tmp_file"
+	fi
 }	
 
