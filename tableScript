@@ -140,8 +140,10 @@ insert_into_table(){
 	
         if [ -f "$tname" ];
         then
-        	echo "That the '$tname' table :"
-		cat "$tname"
+        	header=$(head -1 "$tname")
+		IFS='|' read -r -a columns <<< "$header"
+		
+		echo $header
 		
 		IFS='|' read -r -a columns < "$tname"
 		new_row=""
